@@ -1,6 +1,7 @@
 # Release History
 
 ## 12.24.0-beta.2 (Unreleased)
+- Added support for bearer token challenges.
 
 ### Features Added
 
