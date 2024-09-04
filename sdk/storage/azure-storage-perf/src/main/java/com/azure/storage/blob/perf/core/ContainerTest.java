@@ -25,12 +25,24 @@ public abstract class ContainerTest<TOptions extends PerfStressOptions> extends 
     // NOTE: the pattern setup the parent first, then yourself.
     @Override
     public Mono<Void> globalSetupAsync() {
-        return super.globalSetupAsync().then(blobContainerAsyncClient.create());
+        return super.globalSetupAsync().then(blobContainerAsyncClient.createIfNotExists()).then();
+    }
+
+    @Override
+    public void globalSetup() {
+        super.globalSetup();
+        blobContainerClient.createIfNotExists();
     }
 
     // NOTE: the pattern, cleanup yourself, then the parent.
     @Override
     public Mono<Void> globalCleanupAsync() {
-        return blobContainerAsyncClient.delete().then(super.globalCleanupAsync());
+        return blobContainerAsyncClient.deleteIfExists().then(super.globalCleanupAsync());
+    }
+
+    @Override
+    public void globalCleanup() {
+        blobContainerClient.deleteIfExists();
+        super.globalCleanup();
     }
 }
