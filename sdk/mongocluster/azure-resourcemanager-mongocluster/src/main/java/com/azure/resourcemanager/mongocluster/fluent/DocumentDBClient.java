@@ -12,7 +12,7 @@ import java.time.Duration;
  */
 public interface DocumentDBClient {
     /**
-     * Gets Server parameter.
+     * Gets Service host.
      * 
      * @return the endpoint value.
      */
@@ -80,4 +80,11 @@ public interface DocumentDBClient {
      * @return the PrivateLinksClient object.
      */
     PrivateLinksClient getPrivateLinks();
+
+    /**
+     * Gets the ReplicasClient object to access its operations.
+     * 
+     * @return the ReplicasClient object.
+     */
+    ReplicasClient getReplicas();
 }
