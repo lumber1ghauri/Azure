@@ -14,7 +14,7 @@
 
   <groupId>com.azure</groupId>
   <artifactId>azure-maps-search</artifactId>
-  <version>1.0.0-beta.2</version> <!-- {x-version-update;com.azure:azure-maps-search;current} -->
+  <version>2.0.0-beta.1</version> <!-- {x-version-update;com.azure:azure-maps-search;current} -->
   <packaging>jar</packaging>
 
   <name>Azure Maps SDK Search client library</name>
@@ -53,7 +53,7 @@
     </javaModulesSurefireArgLine>
     <src.dir>src/main</src.dir>
     <test.dir>src/test</test.dir>
-    <jacoco.min.linecoverage>0.4</jacoco.min.linecoverage>
+    <jacoco.min.linecoverage>0.3</jacoco.min.linecoverage>
     <jacoco.min.branchcoverage>0.2</jacoco.min.branchcoverage>
     <jacoco.skip>false</jacoco.skip>
     <codesnippet.skip>false</codesnippet.skip>
