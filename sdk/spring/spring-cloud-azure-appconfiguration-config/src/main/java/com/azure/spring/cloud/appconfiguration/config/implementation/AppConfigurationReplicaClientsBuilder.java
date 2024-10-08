@@ -25,7 +25,7 @@ import com.azure.core.http.policy.RetryStrategy;
 import com.azure.core.util.Configuration;
 import com.azure.core.util.CoreUtils;
 import com.azure.data.appconfiguration.ConfigurationClientBuilder;
-import com.azure.identity.ManagedIdentityCredentialBuilder;
+import com.azure.identity.DefaultAzureCredentialBuilder;
 import com.azure.spring.cloud.appconfiguration.config.ConfigurationClientCustomizer;
 import com.azure.spring.cloud.appconfiguration.config.implementation.http.policy.BaseAppConfigurationPolicy;
 import com.azure.spring.cloud.appconfiguration.config.implementation.http.policy.TracingInfo;
@@ -75,14 +75,12 @@ public class AppConfigurationReplicaClientsBuilder implements EnvironmentAware {
 
     private final ConfigurationClientBuilderFactory clientFactory;
 
-    private Environment env;
-
     private boolean isDev = false;
 
     private boolean isKeyVaultConfigured = false;
 
     private final boolean credentialConfigured;
-
+    
     private final int defaultMaxRetries;
 
     public AppConfigurationReplicaClientsBuilder(int defaultMaxRetries, ConfigurationClientBuilderFactory clientFactory,
@@ -174,12 +172,8 @@ public class AppConfigurationReplicaClientsBuilder implements EnvironmentAware {
         } else {
             for (String endpoint : endpoints) {
                 ConfigurationClientBuilder builder = this.createBuilderInstance();
-                if (!credentialConfigured) {
-                    // System Assigned Identity. Needs to be checked last as all of the above should
-                    // have an Endpoint.
-                    LOGGER.debug("Connecting to {} using Azure System Assigned Identity.", endpoint);
-                    builder.credential(new ManagedIdentityCredentialBuilder().build());
-                }
+
+                builder.credential(new DefaultAzureCredentialBuilder().build());
 
                 builder.endpoint(endpoint);
 
@@ -190,7 +184,6 @@ public class AppConfigurationReplicaClientsBuilder implements EnvironmentAware {
     }
 
     public AppConfigurationReplicaClient buildClient(String failoverEndpoint, ConfigStore configStore) {
-
         if (StringUtils.hasText(configStore.getConnectionString())) {
             ConnectionString connectionString = new ConnectionString(configStore.getConnectionString());
             connectionString.setUri(failoverEndpoint);
@@ -203,12 +196,8 @@ public class AppConfigurationReplicaClientsBuilder implements EnvironmentAware {
             return modifyAndBuildClient(builder, failoverEndpoint, 0);
         } else {
             ConfigurationClientBuilder builder = createBuilderInstance();
-            if (!credentialConfigured) {
-                // System Assigned Identity. Needs to be checked last as all of the above should
-                // have an Endpoint.
-                LOGGER.debug("Connecting to {} using Azure System Assigned Identity.", failoverEndpoint);
-                builder.credential(new ManagedIdentityCredentialBuilder().build());
-            }
+            builder.credential(new DefaultAzureCredentialBuilder().build());
+
             builder.endpoint(failoverEndpoint);
             return modifyAndBuildClient(builder, failoverEndpoint, 0);
         }
@@ -230,35 +219,36 @@ public class AppConfigurationReplicaClientsBuilder implements EnvironmentAware {
     public void setEnvironment(Environment environment) {
         for (String profile : environment.getActiveProfiles()) {
             if ("dev".equalsIgnoreCase(profile)) {
+                // TODO (mametcal) this no longer works
                 this.isDev = true;
                 break;
             }
         }
-        this.env = environment;
     }
 
     protected ConfigurationClientBuilder createBuilderInstance() {
+        // TODO (mametcal) Need global properties to work.
         RetryStrategy retryStatagy = null;
 
-        String mode = env.getProperty(AzureGlobalProperties.PREFIX + "." + RETRY_MODE_PROPERTY_NAME);
-        String modeService = env.getProperty(AzureAppConfigurationProperties.PREFIX + "." + RETRY_MODE_PROPERTY_NAME);
+        //String mode = env.getProperty(AzureGlobalProperties.PREFIX + "." + RETRY_MODE_PROPERTY_NAME);
+        //String modeService = env.getProperty(AzureAppConfigurationProperties.PREFIX + "." + RETRY_MODE_PROPERTY_NAME);
 
-        if ("exponential".equals(mode) || "exponential".equals(modeService) || (mode == null && modeService == null)) {
-            Function<String, Integer> checkPropertyInt = parameter -> (Integer.parseInt(parameter));
-            Function<String, Duration> checkPropertyDuration = parameter -> (DurationStyle.detectAndParse(parameter));
+        //if ("exponential".equals(mode) || "exponential".equals(modeService) || (mode == null && modeService == null)) {
+        Function<String, Integer> checkPropertyInt = parameter -> (Integer.parseInt(parameter));
+        Function<String, Duration> checkPropertyDuration = parameter -> (DurationStyle.detectAndParse(parameter));
 
-            int retries = checkProperty(MAX_RETRIES_PROPERTY_NAME, defaultMaxRetries,
-                " isn't a valid integer, using default value.", checkPropertyInt);
+        int retries = checkProperty(MAX_RETRIES_PROPERTY_NAME, defaultMaxRetries,
+            " isn't a valid integer, using default value.", checkPropertyInt);
 
-            Duration baseDelay = checkProperty(BASE_DELAY_PROPERTY_NAME, DEFAULT_MIN_RETRY_POLICY,
-                " isn't a valid Duration, using default value.", checkPropertyDuration);
-            Duration maxDelay = checkProperty(MAX_DELAY_PROPERTY_NAME, DEFAULT_MAX_RETRY_POLICY,
-                " isn't a valid Duration, using default value.", checkPropertyDuration);
+        Duration baseDelay = checkProperty(BASE_DELAY_PROPERTY_NAME, DEFAULT_MIN_RETRY_POLICY,
+            " isn't a valid Duration, using default value.", checkPropertyDuration);
+        Duration maxDelay = checkProperty(MAX_DELAY_PROPERTY_NAME, DEFAULT_MAX_RETRY_POLICY,
+            " isn't a valid Duration, using default value.", checkPropertyDuration);
 
-            retryStatagy = new ExponentialBackoff(retries, baseDelay, maxDelay);
-        }
+        retryStatagy = new ExponentialBackoff(retries, baseDelay, maxDelay);
+        //}
 
-        ConfigurationClientBuilder builder = clientFactory.build();
+        ConfigurationClientBuilder builder = new ConfigurationClientBuilder();
 
         if (retryStatagy != null) {
             builder.retryPolicy(new RetryPolicy(retryStatagy));
@@ -322,7 +312,6 @@ public class AppConfigurationReplicaClientsBuilder implements EnvironmentAware {
 
         private final String secret;
 
-        @SuppressWarnings("deprecation")
         ConnectionString(String connectionString) {
             if (CoreUtils.isNullOrEmpty(connectionString)) {
                 throw new IllegalArgumentException("'connectionString' cannot be null or empty.");
@@ -358,7 +347,6 @@ public class AppConfigurationReplicaClientsBuilder implements EnvironmentAware {
             }
         }
 
-        @SuppressWarnings("deprecation")
         protected ConnectionString setUri(String uri) {
             try {
                 this.baseUri = new URL(uri);
