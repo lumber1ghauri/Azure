@@ -673,6 +673,13 @@
           "code": "java.method.removed",
           "old": "method com.azure.resourcemanager.compute.models.WindowsConfiguration com.azure.resourcemanager.compute.models.WindowsConfiguration::withEnableVMAgentPlatformUpdates(java.lang.Boolean)",
           "justification": "Service changed the property to readOnly."
+        },
+        {
+          "regex": true,
+          "code" : "java\\.annotation\\.removed",
+          "old" : ".*? com\\.azure\\.developer\\.devcenter\\.models.*",
+          "new" : ".*? com\\.azure\\.developer\\.devcenter\\.models.*",
+          "justification": "Migration to azure-json"
         }
       ]
     }

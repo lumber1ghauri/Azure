@@ -39,6 +39,7 @@ import java.util.List;
  */
 @ServiceClient(builder = TextTranslationClientBuilder.class)
 public final class TextTranslationClient {
+    private static final HttpHeaderName X_CLIENTTRACEID = HttpHeaderName.fromString("X-ClientTraceId");
 
     @Generated
     private final TextTranslationClientImpl serviceClient;
@@ -113,7 +114,7 @@ public final class TextTranslationClient {
      * </table>
      * You can add these to a request with {@link RequestOptions#addHeader}
      * <p><strong>Request Body Schema</strong></p>
-     * 
+     *
      * <pre>
      * {@code
      * [
@@ -123,9 +124,9 @@ public final class TextTranslationClient {
      * ]
      * }
      * </pre>
-     * 
+     *
      * <p><strong>Response Body Schema</strong></p>
-     * 
+     *
      * <pre>
      * {@code
      * [
@@ -194,7 +195,7 @@ public final class TextTranslationClient {
      * </table>
      * You can add these to a request with {@link RequestOptions#addHeader}
      * <p><strong>Request Body Schema</strong></p>
-     * 
+     *
      * <pre>
      * {@code
      * [
@@ -204,9 +205,9 @@ public final class TextTranslationClient {
      * ]
      * }
      * </pre>
-     * 
+     *
      * <p><strong>Response Body Schema</strong></p>
-     * 
+     *
      * <pre>
      * {@code
      * [
@@ -264,7 +265,7 @@ public final class TextTranslationClient {
      * </table>
      * You can add these to a request with {@link RequestOptions#addHeader}
      * <p><strong>Request Body Schema</strong></p>
-     * 
+     *
      * <pre>
      * {@code
      * [
@@ -274,9 +275,9 @@ public final class TextTranslationClient {
      * ]
      * }
      * </pre>
-     * 
+     *
      * <p><strong>Response Body Schema</strong></p>
-     * 
+     *
      * <pre>
      * {@code
      * [
@@ -318,7 +319,7 @@ public final class TextTranslationClient {
      * </table>
      * You can add these to a request with {@link RequestOptions#addHeader}
      * <p><strong>Request Body Schema</strong></p>
-     * 
+     *
      * <pre>
      * {@code
      * [
@@ -328,9 +329,9 @@ public final class TextTranslationClient {
      * ]
      * }
      * </pre>
-     * 
+     *
      * <p><strong>Response Body Schema</strong></p>
-     * 
+     *
      * <pre>
      * {@code
      * [
@@ -390,7 +391,7 @@ public final class TextTranslationClient {
      * </table>
      * You can add these to a request with {@link RequestOptions#addHeader}
      * <p><strong>Request Body Schema</strong></p>
-     * 
+     *
      * <pre>
      * {@code
      * [
@@ -401,9 +402,9 @@ public final class TextTranslationClient {
      * ]
      * }
      * </pre>
-     * 
+     *
      * <p><strong>Response Body Schema</strong></p>
-     * 
+     *
      * <pre>
      * {@code
      * [
@@ -509,7 +510,7 @@ public final class TextTranslationClient {
         // Generated convenience method for translateWithResponse
         RequestOptions requestOptions = new RequestOptions();
         if (clientTraceId != null) {
-            requestOptions.setHeader(HttpHeaderName.fromString("X-ClientTraceId"), clientTraceId);
+            requestOptions.setHeader(X_CLIENTTRACEID, clientTraceId);
         }
         if (sourceLanguage != null) {
             requestOptions.addQueryParam("from", sourceLanguage, false);
@@ -1067,7 +1068,7 @@ public final class TextTranslationClient {
      * </table>
      * You can add these to a request with {@link RequestOptions#addHeader}
      * <p><strong>Response Body Schema</strong></p>
-     * 
+     *
      * <pre>
      * {@code
      * {
@@ -1232,14 +1233,14 @@ public final class TextTranslationClient {
         if (scopes == null) {
             return null;
         }
-        String result = "";
+        StringBuilder result = new StringBuilder();
         for (LanguageScope scope : scopes) {
-            if (!result.isEmpty()) {
-                result += ",";
+            if (result.length() > 0) {
+                result.append(",");
             }
-            result += scope.toString();
+            result.append(scope.toString());
         }
-        return result;
+        return result.toString();
     }
 
     /**
@@ -1264,7 +1265,7 @@ public final class TextTranslationClient {
         // Generated convenience method for lookupDictionaryExamplesWithResponse
         RequestOptions requestOptions = new RequestOptions();
         if (clientTraceId != null) {
-            requestOptions.setHeader(HttpHeaderName.fromString("X-ClientTraceId"), clientTraceId);
+            requestOptions.setHeader(X_CLIENTTRACEID, clientTraceId);
         }
         return lookupDictionaryExamplesWithResponse(sourceLanguage, targetLanguage, BinaryData.fromObject(body),
             requestOptions).getValue().toObject(TYPE_REFERENCE_LIST_DICTIONARY_EXAMPLE_ITEM);
