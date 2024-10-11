@@ -8,6 +8,7 @@ import com.azure.storage.blob.perf.DownloadBlobTest;
 import com.azure.storage.blob.perf.DownloadBlobToFileTest;
 import com.azure.storage.blob.perf.ListBlobsTest;
 import com.azure.storage.blob.perf.DownloadBlobNonSharedClientTest;
+import com.azure.storage.blob.perf.QueryBlobTest;
 import com.azure.storage.blob.perf.UploadBlobNoLengthTest;
 import com.azure.storage.blob.perf.UploadBlobTest;
 import com.azure.storage.blob.perf.UploadBlockBlobTest;
@@ -51,7 +52,8 @@ public class App {
             ReadFileDatalakeTest.class,
             UploadFileDatalakeTest.class,
             UploadFromFileDatalakeTest.class,
-            DownloadBlobNonSharedClientTest.class
+            DownloadBlobNonSharedClientTest.class,
+            QueryBlobTest.class
         }, args);
     }
 }
